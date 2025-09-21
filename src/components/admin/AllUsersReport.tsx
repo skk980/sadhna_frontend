@@ -28,6 +28,7 @@ import { User, Activity, PreachingContact } from "@/types";
 import { format } from "date-fns";
 import { Eye, Users, Phone } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 
 interface AllUsersReportProps {
   searchTerm: string;
@@ -92,6 +93,10 @@ export const AllUsersReport = ({
         (sum, a) => sum + a.lectureDuration,
         0
       ),
+      totalReadingDuration: userActivities.reduce(
+        (sum, a) => sum + a.readingDuration,
+        0
+      ),
       preachingContacts: allContacts.length,
       preachingContactsList: allContacts,
     };
@@ -122,6 +127,7 @@ export const AllUsersReport = ({
                 <TableHead>Mangala Aarti</TableHead>
                 <TableHead>Total Japa Rounds</TableHead>
                 <TableHead>Lecture Hearing Duration</TableHead>
+                <TableHead>Reading Duration</TableHead>
                 <TableHead>Preaching Contacts</TableHead>
               </TableRow>
             </TableHeader>
@@ -146,6 +152,7 @@ export const AllUsersReport = ({
                     </TableCell>
                     <TableCell>{stats.totalJapaRounds}</TableCell>
                     <TableCell>{stats.totalLectureDuration} min</TableCell>
+                    <TableCell>{stats.totalReadingDuration} min</TableCell>
                     <TableCell>
                       {stats.preachingContacts > 0 ? (
                         <Button
@@ -194,10 +201,11 @@ export const AllUsersReport = ({
               <TableRow>
                 <TableHead>Date</TableHead>
                 <TableHead>User</TableHead>
+                <TableHead>Wake Up</TableHead>
                 <TableHead>Mangala Aarti</TableHead>
                 <TableHead>Japa Rounds</TableHead>
                 <TableHead>Lecture Hearing Duration</TableHead>
-                <TableHead>Wake Up</TableHead>
+                <TableHead>Reading Duration</TableHead>
                 <TableHead>Sleep</TableHead>
                 <TableHead>Preaching</TableHead>
               </TableRow>
@@ -221,6 +229,7 @@ export const AllUsersReport = ({
                       <TableCell className="font-medium">
                         {user?.name || "Unknown"}
                       </TableCell>
+                      <TableCell>{activity.wakeUpTime || "-"}</TableCell>
                       <TableCell>
                         <Badge
                           variant={
@@ -231,8 +240,42 @@ export const AllUsersReport = ({
                         </Badge>
                       </TableCell>
                       <TableCell>{activity.japaRounds}</TableCell>
-                      <TableCell>{activity.lectureDuration} min</TableCell>
-                      <TableCell>{activity.wakeUpTime || "-"}</TableCell>
+                      <TableCell>
+                        {activity.lectureDuration} min &nbsp;
+                        {activity.lectureDesciption && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Eye className="w-4 h-4 text-primary" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="max-w-xs">
+                              <div className="text-sm py-4">
+                                {activity.lectureDesciption}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                      </TableCell>
+
+                      {/* Reading Duration Cell */}
+                      <TableCell>
+                        {activity.readingDuration} min &nbsp;
+                        {activity.readingDesciption && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button variant="ghost" size="icon">
+                                <Eye className="w-4 h-4 text-primary" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="max-w-xs">
+                              <div className="text-sm py-4">
+                                {activity.readingDesciption}
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                      </TableCell>
                       <TableCell>{activity.sleepTime || "-"}</TableCell>
                       <TableCell>
                         {activity.preachingContacts &&

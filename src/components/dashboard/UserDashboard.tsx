@@ -45,6 +45,11 @@ export const UserDashboard = () => {
     (sum, a) => sum + a.lectureDuration,
     0
   );
+  const totalReadingDuration = activities.reduce(
+    (sum, a) => sum + a.readingDuration,
+    0
+  );
+
   const mangalaAartiCount = activities.filter((a) => a.mangalaAarti).length;
 
   return (
@@ -129,16 +134,16 @@ export const UserDashboard = () => {
           <Card className="divine-glow transition-sacred hover-divine bg-gradient-lotus border-accent/20">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-foreground">
-                Lecture Hearing Time
+                Lecture Hearing & Reading Time
               </CardTitle>
               <Clock className="h-6 w-6 text-accent animate-divine-float" />
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-accent">
-                {totalLectureTime}
+                {totalLectureTime} & {totalReadingDuration}
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Minutes of learning
+                Minutes of hearing and reading
               </p>
             </CardContent>
           </Card>
@@ -429,13 +434,15 @@ export const UserDashboard = () => {
                             <p className="flex items-center gap-2">
                               <Sun className="w-3 h-3" />
                               Sacred Wake Time:
-                              {new Date(
-                                `2000-01-01T${activity.wakeUpTime}`
-                              ).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true,
-                              })}
+                              {activity?.wakeUpTime?.length
+                                ? new Date(
+                                    `2000-01-01T${activity.wakeUpTime}`
+                                  ).toLocaleTimeString("en-US", {
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  })
+                                : " Date not available"}
                             </p>
 
                             <p className="flex items-center gap-2">
@@ -462,15 +469,22 @@ export const UserDashboard = () => {
                               minutes
                             </p>
                             <p className="flex items-center gap-2">
+                              <Clock className="w-3 h-3" />
+                              Reading Hearing: {activity.readingDuration}
+                              minutes
+                            </p>
+                            <p className="flex items-center gap-2">
                               <Moon className="w-3 h-3" />
                               Sacred Rest Time:
-                              {new Date(
-                                `2000-01-01T${activity.sleepTime}`
-                              ).toLocaleTimeString("en-US", {
-                                hour: "numeric",
-                                minute: "2-digit",
-                                hour12: true,
-                              })}
+                              {activity?.sleepTime?.length
+                                ? new Date(
+                                    `2000-01-01T${activity.sleepTime}`
+                                  ).toLocaleTimeString("en-US", {
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                    hour12: true,
+                                  })
+                                : " Date not available"}
                             </p>
 
                             <p className="flex items-center gap-2">

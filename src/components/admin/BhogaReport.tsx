@@ -110,10 +110,10 @@ export const BhogaReport = () => {
       });
       setModalOpen(false);
     } catch (error) {
-      console.error("Failed to save schedule:", error);
+      console.error("Failed to save schedule:", error.message);
       toast({
-        title: error,
-        description: error,
+        title: error.message,
+        description: error.message,
         variant: "destructive",
       });
     } finally {
@@ -218,7 +218,8 @@ export const BhogaReport = () => {
               : format(date, "MMM dd, yyyy");
 
             // Assigned user id and name for this day
-            const assignedUserId = localSchedule?.[dayName]?._id || null;
+            const assignedUserId =
+              dayName !== "sunday" ? localSchedule?.[dayName]?._id : null;
             const assignedUserName = assignedUserId
               ? users.find((u) => u._id === assignedUserId)?.name || "Unknown"
               : null;
@@ -276,6 +277,10 @@ export const BhogaReport = () => {
                       </div>
                     ))}
                   </div>
+                ) : dayName === "sunday" ? (
+                  <span className="text-sm text-muted-foreground italic">
+                    No Offering Duty
+                  </span>
                 ) : assignedUserName ? (
                   <p className="text-sm text-muted-foreground italic">
                     Assigned user {assignedUserName} has not offered bhoga yet.

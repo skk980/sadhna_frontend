@@ -48,6 +48,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     user: null,
   });
   const [loading, setLoading] = useState(true);
+  const [logoutLoading, setlogoutLoading] = useState(false);
   const [token, setToken] = useState<string | undefined>(undefined);
   const [bhogaSchedule, setBhogaSchedule] = useState<BhogaSchedule | null>(
     null
@@ -56,26 +57,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // User list state
   const [users, setUsers] = useState<User[]>([]);
 
-  // Debounced fetchUsers function
-  const debouncedFetchUsers = useMemo(
-    () =>
-      debounce(async () => {
-        try {
-          const res = await axios.get(`${BACKEND_URL}/auth/api/users`, {
-            headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-          });
-          setUsers(res.data.users || []);
-        } catch (error) {
-          console.error("Failed to fetch users:", error);
-          setUsers([]);
-        }
-      }, 300),
-    [token]
-  );
-
   // Expose a fetchUsers handler
-  const fetchUsers = () => {
-    debouncedFetchUsers();
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get(`${BACKEND_URL}/auth/api/users`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+      setUsers(res.data.users || []);
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Failed to fetch users:", error.message);
+      setUsers([]);
+      Promise.reject(error);
+    }
   };
 
   const loadUserProfile = async (jwtToken: string) => {
@@ -118,6 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = async (): Promise<void> => {
+    setlogoutLoading(true);
     try {
       // Call backend logout endpoint
       if (token) {
@@ -128,16 +123,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
+        setAuth({ isAuthenticated: false, user: null });
+        setToken(undefined);
+        setUsers([]);
+        setBhogaSchedule(null);
+        localStorage.removeItem("sadhana_token");
       }
     } catch (error) {
-      console.error("Logout API call failed:", error);
+      console.error("Logout API call failed:", error.message);
     } finally {
       // Always clear frontend state regardless of API success/failure
-      setAuth({ isAuthenticated: false, user: null });
-      setToken(undefined);
-      setUsers([]);
-      setBhogaSchedule(null);
-      localStorage.removeItem("sadhana_token");
+
+      setlogoutLoading(false);
     }
   };
 
@@ -160,9 +157,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      return res.data.success || true;
-    } catch {
-      return false;
+      return Promise.resolve(res.data.success);
+    } catch (err) {
+      console.log(err);
+      return Promise.reject(err?.response?.data?.message || err?.message);
     }
   };
 
@@ -176,6 +174,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       return res;
     } catch (error) {
       setBhogaSchedule(null);
+      console.log(error.message);
     }
   };
 
@@ -200,6 +199,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         token,
         login,
         logout,
+        logoutLoading,
         registerUser,
         users,
         fetchUsers,

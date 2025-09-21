@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { Spin } from "antd";
 
 interface UserRegistrationFormProps {
   onClose: () => void;
@@ -24,23 +25,28 @@ export const UserRegistrationForm = ({
   const { registerUser } = useAuth();
   const { toast } = useToast();
   const { auth, fetchUsers } = useAuth();
+  const [registerloading, setregisterloading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (registerUser(name, email)) {
+    setregisterloading(true);
+    try {
+      await registerUser(name, email);
       toast({
         title: "User Registered",
         description: `${name} has been successfully registered`,
       });
-      fetchUsers();
+      await fetchUsers();
+      setregisterloading(false);
       onClose();
-    } else {
+    } catch (error) {
       toast({
         title: "Registration Failed",
-        description: "User with this email already exists",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
+      setregisterloading(false);
     }
   };
 
@@ -54,46 +60,48 @@ export const UserRegistrationForm = ({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter devotee's name"
-              required
-            />
-          </div>
+        <Spin spinning={registerloading}>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Enter devotee's name"
+                required
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter email address"
-              required
-            />
-          </div>
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter email address"
+                required
+              />
+            </div>
 
-          <div className="bg-muted/50 p-3 rounded-md">
-            <p className="text-sm text-muted-foreground">
-              Default password for new devotee:{" "}
-              <code className="font-mono">password</code>
-            </p>
-          </div>
+            <div className="bg-muted/50 p-3 rounded-md">
+              <p className="text-sm text-muted-foreground">
+                Default password for new devotee:{" "}
+                <code className="font-mono">password</code>
+              </p>
+            </div>
 
-          <div className="flex gap-2">
-            <Button type="submit" className="flex-1">
-              Register User
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
-              Cancel
-            </Button>
-          </div>
-        </form>
+            <div className="flex gap-2">
+              <Button type="submit" className="flex-1">
+                Register User
+              </Button>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </Spin>
       </DialogContent>
     </Dialog>
   );

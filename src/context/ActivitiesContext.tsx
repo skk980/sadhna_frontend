@@ -51,7 +51,7 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
       });
       setActivities(res.data.activities || []);
     } catch (error) {
-      console.error("Error loading activities:", error);
+      console.error("Error loading activities:", error.message);
       setActivities([]);
     } finally {
       setLoading(false);
@@ -72,24 +72,24 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
   ) => {
     if (!token) {
       console.error("Missing auth token for adding activity");
-      return false;
+      return Promise.reject();
     }
     try {
       const res = await axios.post(`${BACKEND_URL}/activities`, activity, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setActivities((prev) => [res.data.activity, ...prev]);
-      return true;
+      return Promise.resolve();
     } catch (error) {
-      console.error("Error adding activity:", error);
-      return false;
+      console.error("Error adding activity:", error.message);
+      return Promise.reject();
     }
   };
 
   const updateActivity = async (id: string, updates: Partial<Activity>) => {
     if (!token) {
       console.error("Missing auth token for updating activity");
-      return false;
+      return Promise.reject();
     }
     try {
       const res = await axios.put(`${BACKEND_URL}/activities/${id}`, updates, {
@@ -98,10 +98,10 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
       setActivities((prev) =>
         prev.map((a) => (a._id === id ? res.data.activity : a))
       );
-      return true;
+      return Promise.resolve();
     } catch (error) {
-      console.error("Error updating activity:", error);
-      return false;
+      console.error("Error updating activity:", error.message);
+      return Promise.reject();
     }
   };
 

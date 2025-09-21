@@ -2,11 +2,14 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   createdAt: string;
 }
 
 export interface Activity {
+  lectureDesciption: string;
+  readingDuration: number;
+  readingDesciption: string;
   id: string;
   userId: string;
   date: string;

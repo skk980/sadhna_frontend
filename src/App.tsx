@@ -12,11 +12,12 @@ import { LogOut, Flower2, Sun, Star } from "lucide-react";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ActivitiesProvider } from "@/context/ActivitiesContext";
+import { Button as AntButton } from "antd";
 
 const queryClient = new QueryClient();
 
 const MainApp = () => {
-  const { auth, logout, loading } = useAuth();
+  const { auth, logout, loading, logoutLoading } = useAuth();
 
   console.log(auth);
 
@@ -66,15 +67,16 @@ const MainApp = () => {
                   : "🕉️ Devotee"}
               </p>
             </div>
-            <Button
-              variant="outline"
-              size="sm"
+            <AntButton
+              type="dashed"
+              size="small"
               onClick={logout}
-              className="transition-sacred hover-divine border-primary/20"
+              className="transition-sacred text-white hover-divine bg-red-500 hover:bg-red-300 py-4"
+              loading={logoutLoading}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Exit
-            </Button>
+            </AntButton>
           </div>
         </div>
       </header>

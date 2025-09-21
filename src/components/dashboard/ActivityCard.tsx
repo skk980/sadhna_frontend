@@ -8,11 +8,18 @@ import {
   Moon,
   CheckCircle,
   XCircle,
+  Book,
+  Eye,
 } from "lucide-react";
 import { Activity } from "@/types";
 import { useActivities } from "@/context/ActivitiesContext";
 import { useState } from "react";
 import { ActivityForm } from "./ActivityForm";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -64,6 +71,26 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-gradient-lotus p-4 rounded-lg border border-primary/10 divine-glow transition-sacred hover-divine">
           <div className="flex items-center gap-3 mb-2">
+            <Sun className="w-5 h-5 text-primary animate-sacred-pulse" />
+            <p className="text-sm font-medium text-muted-foreground">
+              Sacred Wake Time
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-primary">
+            {activity.wakeUpTime
+              ? new Date(
+                  `2000-01-01T${activity.wakeUpTime}`
+                ).toLocaleTimeString("en-US", {
+                  hour: "numeric",
+                  minute: "2-digit",
+                  hour12: true,
+                })
+              : "Not set"}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">🌅 Early rising</p>
+        </div>
+        <div className="bg-gradient-lotus p-4 rounded-lg border border-primary/10 divine-glow transition-sacred hover-divine">
+          <div className="flex items-center gap-3 mb-2">
             <Target className="w-5 h-5 text-primary animate-sacred-pulse" />
             <p className="text-sm font-medium text-muted-foreground">
               Sacred Japa Rounds
@@ -83,34 +110,52 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
             <p className="text-sm font-medium text-muted-foreground">
               Lecture Hearing Duration
             </p>
+            {activity?.lectureDesciption && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Eye className="w-5 h-5 text-primary" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="max-w-xs">
+                  <div className="text-sm">{activity.lectureDesciption}</div>
+                </PopoverContent>
+              </Popover>
+            )}
           </div>
           <p className="text-2xl font-bold text-accent">
-            {activity.lectureDuration}
+            {activity?.lectureDuration}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            📚 Minutes of hearing
+          </p>
+        </div>
+
+        <div className="bg-gradient-lotus p-4 rounded-lg border border-accent/10 divine-glow transition-sacred hover-divine">
+          <div className="flex items-center gap-3 mb-2">
+            <Book className="w-5 h-5 text-accent animate-divine-float" />
+            <p className="text-sm font-medium text-muted-foreground">
+              Reading Duration
+            </p>
+            {activity.readingDesciption && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Eye className="w-5 h-5 text-primary" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="max-w-xs">
+                  <div className="text-sm">{activity.readingDesciption}</div>
+                </PopoverContent>
+              </Popover>
+            )}
+          </div>
+          <p className="text-2xl font-bold text-accent">
+            {activity.readingDuration}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             📚 Minutes of learning
           </p>
-        </div>
-
-        <div className="bg-gradient-lotus p-4 rounded-lg border border-primary/10 divine-glow transition-sacred hover-divine">
-          <div className="flex items-center gap-3 mb-2">
-            <Sun className="w-5 h-5 text-primary animate-sacred-pulse" />
-            <p className="text-sm font-medium text-muted-foreground">
-              Sacred Wake Time
-            </p>
-          </div>
-          <p className="text-2xl font-bold text-primary">
-            {activity.wakeUpTime
-              ? new Date(
-                  `2000-01-01T${activity.wakeUpTime}`
-                ).toLocaleTimeString("en-US", {
-                  hour: "numeric",
-                  minute: "2-digit",
-                  hour12: true,
-                })
-              : "Not set"}
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">🌅 Early rising</p>
         </div>
 
         <div className="bg-gradient-lotus p-4 rounded-lg border border-accent/10 divine-glow transition-sacred hover-divine">
@@ -179,7 +224,7 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
           </div>
 
           <div className="flex items-center justify-between">
-            <span className="text-sm">📚 Study Session</span>
+            <span className="text-sm">👂 Hearing Session</span>
             <div
               className={`px-2 py-1 rounded-full text-xs ${
                 activity.lectureDuration >= 30
@@ -192,6 +237,25 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
               {activity.lectureDuration >= 30
                 ? "Excellent"
                 : activity.lectureDuration > 0
+                ? "Good"
+                : "Not Done"}
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <span className="text-sm">📚 Reading Session</span>
+            <div
+              className={`px-2 py-1 rounded-full text-xs ${
+                activity.readingDuration >= 30
+                  ? "bg-primary/20 text-primary"
+                  : activity.readingDuration > 0
+                  ? "bg-accent/20 text-accent"
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {activity.readingDuration >= 30
+                ? "Excellent"
+                : activity.readingDuration > 0
                 ? "Good"
                 : "Not Done"}
             </div>

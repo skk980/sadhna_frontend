@@ -56,7 +56,10 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
         <Star className="absolute bottom-20 right-20 w-6 h-6 text-accent/40 animate-pulse" />
       </div>
 
-      <Card className="w-full max-w-md divine-glow border-primary/20">
+      <Card
+        className="w-full max-w-md divine-glow border-primary/20"
+        style={{ height: "90vh" }}
+      >
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center mb-4">
             <div className="relative">
