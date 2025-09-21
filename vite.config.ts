@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8080,
-    allowedHosts: ["sadhna-pmwi.onrender.com", "localhost"],
+    allowedHosts: ["sadhna-frontend.onrender.com", "localhost"],
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(
     Boolean
