@@ -80,11 +80,11 @@ export const PreachingReport = () => {
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-primary" />
                     <span className="font-medium">
-                      User Name: {activity.userId.name}
+                      User Name: {activity?.userId?.name}
                     </span>
                   </div>
                   <span className="text-sm text-muted-foreground">
-                    {format(new Date(activity.date), "MMM dd, yyyy")}
+                    {format(new Date(activity?.date), "MMM dd, yyyy")}
                   </span>
                 </div>
 

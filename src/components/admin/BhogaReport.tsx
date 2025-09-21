@@ -224,7 +224,7 @@ export const BhogaReport = () => {
               : null;
 
             // User IDs who actually offered bhoga on this day
-            const offeringUserIds = offerings.map((a) => a.userId._id);
+            const offeringUserIds = offerings.map((a) => a?.userId?._id);
 
             // Determine if assigned user did not offer but others did
             const assignedUserDidNotOffer =
@@ -234,8 +234,8 @@ export const BhogaReport = () => {
 
             // Names of users who actually offered bhoga excluding assigned user
             const otherOfferingUsers = offerings
-              .filter((a) => a.userId._id !== assignedUserId)
-              .map((a) => a.userId.name);
+              .filter((a) => a?.userId?._id !== assignedUserId)
+              .map((a) => a?.userId?.name);
 
             return (
               <div
@@ -268,7 +268,7 @@ export const BhogaReport = () => {
                       >
                         <User className="w-4 h-4 text-accent" />
                         <span className="font-medium">
-                          User Name: {activity.userId.name}
+                          User Name: {activity?.userId?.name}
                         </span>
                         <span className="text-sm text-muted-foreground">
                           offered bhoga

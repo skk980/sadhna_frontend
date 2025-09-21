@@ -70,7 +70,7 @@ export const AllUsersReport = ({
     if (searchTerm) {
       const userIds = filteredUsers.map((u) => u._id);
       filteredActivities = filteredActivities.filter((a) =>
-        userIds.includes(a.userId._id)
+        userIds.includes(a.userId?._id)
       );
     }
 
@@ -79,7 +79,7 @@ export const AllUsersReport = ({
 
   const getUserStats = (userId: string) => {
     const userActivities = filteredData.activities.filter(
-      (a) => a.userId._id === userId
+      (a) => a.userId?._id === userId
     );
     const allContacts = userActivities.flatMap(
       (a) => a.preachingContacts || []
@@ -209,7 +209,9 @@ export const AllUsersReport = ({
                     new Date(b.date).getTime() - new Date(a.date).getTime()
                 )
                 .map((activity) => {
-                  const user = users.find((u) => u._id === activity.userId._id);
+                  const user = users.find(
+                    (u) => u._id === activity?.userId?._id
+                  );
 
                   return (
                     <TableRow key={activity._id}>
