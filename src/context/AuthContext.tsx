@@ -10,6 +10,7 @@ import React, {
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { User, AuthState } from "@/types";
+import { BACKEND_URL } from "@/api";
 
 interface BhogaSchedule {
   monday?: string | null;
@@ -60,7 +61,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     () =>
       debounce(async () => {
         try {
-          const res = await axios.get("http://localhost:4000/auth/api/users", {
+          const res = await axios.get(`${BACKEND_URL}/auth/api/users`, {
             headers: token ? { Authorization: `Bearer ${token}` } : undefined,
           });
           setUsers(res.data.users || []);
@@ -79,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loadUserProfile = async (jwtToken: string) => {
     try {
-      const res = await axios.get("http://localhost:4000/auth/profile", {
+      const res = await axios.get(`${BACKEND_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${jwtToken}` },
       });
       setAuth({ isAuthenticated: true, user: res.data.user });
@@ -102,7 +103,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
-      const res = await axios.post("http://localhost:4000/auth/login", {
+      const res = await axios.post(`${BACKEND_URL}/auth/login`, {
         email,
         password,
       });
@@ -121,7 +122,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // Call backend logout endpoint
       if (token) {
         await axios.post(
-          "http://localhost:4000/auth/logout",
+          `${BACKEND_URL}/auth/logout`,
           {},
           {
             headers: { Authorization: `Bearer ${token}` },
@@ -147,7 +148,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   ): Promise<boolean> => {
     try {
       const res = await axios.post(
-        "http://localhost:4000/auth/register",
+        `${BACKEND_URL}/auth/register`,
         {
           name,
           email,
@@ -168,7 +169,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const fetchBhogaSchedule = async () => {
     if (!token) return;
     try {
-      const res = await axios.get("http://localhost:4000/auth/bhoga-schedule", {
+      const res = await axios.get(`${BACKEND_URL}/auth/bhoga-schedule`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBhogaSchedule(res.data.schedule || null);
@@ -180,7 +181,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateBhogaSchedule = async (schedule: BhogaSchedule) => {
     if (!token) throw new Error("No auth token");
-    await axios.put("http://localhost:4000/auth/bhoga-schedule", schedule, {
+    await axios.put(`${BACKEND_URL}/auth/bhoga-schedule`, schedule, {
       headers: { Authorization: `Bearer ${token}` },
     });
     await fetchBhogaSchedule();

@@ -1,0 +1,5 @@
+deploy:
+  stage: deploy
+  script:
+    - apt-get update && apt-get install -y lftp
+    - lftp -c "set ftp:ssl-allow no; open -u $FTP_USER,$FTP_PASS $FTP_HOST; mirror -R dist /your/path"

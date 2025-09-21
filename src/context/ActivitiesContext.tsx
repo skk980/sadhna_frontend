@@ -10,6 +10,7 @@ import React, {
 import axios from "axios";
 import { Activity } from "@/types";
 import { useAuth } from "@/context/AuthContext";
+import { BACKEND_URL } from "../api/index";
 
 interface ActivitiesContextType {
   activities: Activity[];
@@ -44,7 +45,7 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
     }
     try {
       setLoading(true);
-      const res = await axios.get("http://localhost:4000/activities", {
+      const res = await axios.get(`${BACKEND_URL}/activities`, {
         params: userId ? { userId } : {},
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -74,13 +75,9 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
     try {
-      const res = await axios.post(
-        "http://localhost:4000/activities",
-        activity,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.post(`${BACKEND_URL}/activities`, activity, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setActivities((prev) => [res.data.activity, ...prev]);
       return true;
     } catch (error) {
@@ -95,13 +92,9 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
       return false;
     }
     try {
-      const res = await axios.put(
-        `http://localhost:4000/activities/${id}`,
-        updates,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      const res = await axios.put(`${BACKEND_URL}/activities/${id}`, updates, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setActivities((prev) =>
         prev.map((a) => (a._id === id ? res.data.activity : a))
       );
