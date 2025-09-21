@@ -121,7 +121,7 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
             </Button>
           </form>
 
-          <div className="relative mt-8">
+          {/* <div className="relative mt-8">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
             </div>
@@ -140,9 +140,9 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
           >
             <Flower2 className="w-5 h-5 mr-3" />
             Create Account
-          </Button>
+          </Button> */}
 
-          <div className="mt-6 p-4 bg-muted rounded-lg">
+          {/* <div className="mt-6 p-4 bg-muted rounded-lg">
             <p className="text-xs text-muted-foreground text-center font-medium">
               🙏 Demo credentials for testing
             </p>
@@ -150,7 +150,7 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
               <p>Admin: admin@sadhna.com / password</p>
               <p>Any registered user / password</p>
             </div>
-          </div>
+          </div> */}
         </CardContent>
       </Card>
     </div>
