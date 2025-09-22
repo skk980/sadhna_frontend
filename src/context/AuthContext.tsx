@@ -133,7 +133,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setToken(undefined);
         setUsers([]);
         setBhogaSchedule(null);
-        localStorage.removeItem("sadhana_token");
+        // localStorage.removeItem("sadhana_token");
       }
     } catch (error) {
       console.error("Logout API call failed:", error.message);
