@@ -44,6 +44,7 @@ export const AllUsersReport = ({
   const [selectedContacts, setSelectedContacts] = useState<PreachingContact[]>(
     []
   );
+  const [reasonModalOpen, setReasonModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const filteredData = useMemo(() => {
@@ -229,7 +230,18 @@ export const AllUsersReport = ({
                       <TableCell className="font-medium">
                         {user?.name || "Unknown"}
                       </TableCell>
-                      <TableCell>{activity.wakeUpTime || "-"}</TableCell>
+                      <TableCell>
+                        {" "}
+                        {activity.wakeUpTime
+                          ? new Date(
+                              `2000-01-01T${activity.wakeUpTime}`
+                            ).toLocaleTimeString("en-US", {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            })
+                          : "Not set"}
+                      </TableCell>
                       <TableCell>
                         <Badge
                           variant={
@@ -238,6 +250,33 @@ export const AllUsersReport = ({
                         >
                           {activity.mangalaAarti ? "Yes" : "No"}
                         </Badge>
+                        {activity.mangalaAartiReason && (
+                          <Dialog
+                            open={reasonModalOpen}
+                            onOpenChange={setReasonModalOpen}
+                          >
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="link"
+                                size="icon"
+                                aria-label="View mangala aarti reason"
+                                onClick={() => setReasonModalOpen(true)}
+                              >
+                                <Eye className="w-4 h-4 text-primary" />
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="max-w-sm">
+                              <DialogHeader>
+                                <DialogTitle className="italic">
+                                  Reason for not attending Mangala Aarti
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="mt-4 text-base text-foreground">
+                                {activity.mangalaAartiReason}
+                              </div>
+                            </DialogContent>
+                          </Dialog>
+                        )}
                       </TableCell>
                       <TableCell>{activity.japaRounds}</TableCell>
                       <TableCell>
@@ -276,7 +315,18 @@ export const AllUsersReport = ({
                           </Popover>
                         )}
                       </TableCell>
-                      <TableCell>{activity.sleepTime || "-"}</TableCell>
+                      <TableCell>
+                        {" "}
+                        {activity.sleepTime
+                          ? new Date(
+                              `2000-01-01T${activity.sleepTime}`
+                            ).toLocaleTimeString("en-US", {
+                              hour: "numeric",
+                              minute: "2-digit",
+                              hour12: true,
+                            })
+                          : "Not set"}
+                      </TableCell>
                       <TableCell>
                         {activity.preachingContacts &&
                         activity.preachingContacts.length > 0 ? (

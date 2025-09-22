@@ -14,6 +14,7 @@ export interface Activity {
   userId: string;
   date: string;
   mangalaAarti: boolean;
+  mangalaAartiReason: string;
   japaRounds: number;
   lectureDuration: number; // in minutes
   wakeUpTime: string;

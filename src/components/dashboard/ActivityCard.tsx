@@ -20,6 +20,13 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
+import {
+  DialogContent,
+  Dialog,
+  DialogTrigger,
+  DialogHeader,
+} from "../ui/dialog";
+import { DialogTitle } from "@radix-ui/react-dialog";
 
 interface ActivityCardProps {
   activity: Activity;
@@ -29,6 +36,7 @@ interface ActivityCardProps {
 export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
   const { canEditActivity } = useActivities();
   const [showEditForm, setShowEditForm] = useState(false);
+  const [reasonModalOpen, setReasonModalOpen] = useState(false);
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -36,10 +44,10 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
         <div className="flex items-center gap-3">
           <Badge
             variant={activity.mangalaAarti ? "default" : "secondary"}
-            className={`px-3 py-1 text-sm font-medium ${
+            className={`px-3 py-1 text-sm font-medium  ${
               activity.mangalaAarti
-                ? "bg-green-500 text-white border-primary/20"
-                : "bg-red-500 text-white border-muted-foreground/20"
+                ? "bg-green-500 hover:bg-green-400 text-white border-primary/20"
+                : "bg-red-500 hover:bg-red-400 text-white border-muted-foreground/20"
             }`}
           >
             {activity.mangalaAarti ? (
@@ -48,9 +56,38 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
                 🌅 Attended Mangala Aarti
               </div>
             ) : (
-              <div className="flex items-center gap-2">
-                <XCircle className="w-3 h-3" />⏰ Missed Mangala Aarti
-              </div>
+              <>
+                <div className="flex items-center gap-2">
+                  <XCircle className="w-3 h-3" />⏰ Missed Mangala Aarti
+                </div>
+                {activity.mangalaAartiReason && (
+                  <Dialog
+                    open={reasonModalOpen}
+                    onOpenChange={setReasonModalOpen}
+                  >
+                    <DialogTrigger asChild>
+                      <Button
+                        variant="link"
+                        size="icon"
+                        aria-label="View mangala aarti reason"
+                        onClick={() => setReasonModalOpen(true)}
+                      >
+                        <Eye className="w-4 h-4 text-secondary" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-sm">
+                      <DialogHeader>
+                        <DialogTitle className="italic">
+                          Reason for not attending Mangala Aarti
+                        </DialogTitle>
+                      </DialogHeader>
+                      <div className="mt-4 text-base text-foreground">
+                        {activity.mangalaAartiReason}
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </>
             )}
           </Badge>
           {canEditActivity(selectedDate) && (
@@ -60,8 +97,7 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
               onClick={() => setShowEditForm(true)}
               className="border-primary/20 hover:border-primary/50 transition-sacred hover-divine"
             >
-              <Edit2 className="h-4 w-4 mr-2" />
-              Edit Sacred Record
+              <Edit2 className="h-4" />
             </Button>
           )}
         </div>
@@ -175,7 +211,7 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
                     hour12: true,
                   }
                 )
-              : "Not set"}
+              : " Not set"}
           </p>
           <p className="text-xs text-muted-foreground mt-1">🌙 Peaceful rest</p>
         </div>

@@ -24,6 +24,7 @@ import {
   Sun,
   Star,
   Moon,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
@@ -31,13 +32,20 @@ import { useAuth } from "@/context/AuthContext";
 import { useActivities } from "@/context/ActivitiesContext";
 import { ActivityForm } from "./ActivityForm";
 import { ActivityCard } from "./ActivityCard";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
 
 export const UserDashboard = () => {
   const { auth } = useAuth();
   const { activities, getActivityByDate } = useActivities(auth.user?._id);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showActivityForm, setShowActivityForm] = useState(false);
-
+  const [reasonModalOpen, setReasonModalOpen] = useState(false);
   const selectedDateString = format(selectedDate, "yyyy-MM-dd");
   const todaysActivity = getActivityByDate(selectedDateString);
   const totalJapaRounds = activities.reduce((sum, a) => sum + a.japaRounds, 0);
@@ -451,6 +459,34 @@ export const UserDashboard = () => {
                               {activity.mangalaAarti
                                 ? "🌅 Attended"
                                 : "⏰ Missed"}
+                              {activity.mangalaAartiReason && (
+                                <Dialog
+                                  open={reasonModalOpen}
+                                  onOpenChange={setReasonModalOpen}
+                                >
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="link"
+                                      size="icon"
+                                      aria-label="View mangala aarti reason"
+                                      onClick={() => setReasonModalOpen(true)}
+                                      className="p-0 m-0"
+                                    >
+                                      <Eye className="w-4 h-4 text-primary" />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="max-w-sm">
+                                    <DialogHeader>
+                                      <DialogTitle className="italic">
+                                        Reason for not attending Mangala Aarti
+                                      </DialogTitle>
+                                    </DialogHeader>
+                                    <div className="mt-4 text-base text-foreground">
+                                      {activity.mangalaAartiReason}
+                                    </div>
+                                  </DialogContent>
+                                </Dialog>
+                              )}
                             </p>
                             <p className="flex items-center gap-2">
                               <Flower2 className="w-3 h-3" />
@@ -484,7 +520,7 @@ export const UserDashboard = () => {
                                     minute: "2-digit",
                                     hour12: true,
                                   })
-                                : " Date not available"}
+                                : " Not set"}
                             </p>
 
                             <p className="flex items-center gap-2">

@@ -12,12 +12,12 @@ import { LogOut, Flower2, Sun, Star } from "lucide-react";
 import NotFound from "./pages/NotFound";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ActivitiesProvider } from "@/context/ActivitiesContext";
-import { Button as AntButton } from "antd";
+import { Button as AntButton, Spin } from "antd";
 
 const queryClient = new QueryClient();
 
 const MainApp = () => {
-  const { auth, logout, loading, logoutLoading } = useAuth();
+  const { auth, logout, loading, logoutLoading, usersloading } = useAuth();
 
   console.log(auth);
 
@@ -80,10 +80,11 @@ const MainApp = () => {
           </div>
         </div>
       </header>
-
-      <main className="container mx-auto px-4 py-8">
-        {auth.user?.role === "admin" ? <AdminDashboard /> : <UserDashboard />}
-      </main>
+      <Spin spinning={usersloading}>
+        <main className="container mx-auto px-4 py-8">
+          {auth.user?.role === "admin" ? <AdminDashboard /> : <UserDashboard />}
+        </main>
+      </Spin>
 
       {/* Floating spiritual elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">

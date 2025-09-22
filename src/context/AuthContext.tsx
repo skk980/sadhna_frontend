@@ -35,6 +35,8 @@ interface AuthContextType {
   ) => Promise<boolean>;
   users: User[];
   fetchUsers: () => void;
+  usersloading: boolean;
+  logoutLoading: boolean;
   bhogaSchedule: BhogaSchedule | null;
   fetchBhogaSchedule: () => Promise<void>;
   updateBhogaSchedule: (schedule: BhogaSchedule) => Promise<void>;
@@ -49,6 +51,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   });
   const [loading, setLoading] = useState(true);
   const [logoutLoading, setlogoutLoading] = useState(false);
+  const [usersloading, setusersloading] = useState(false);
   const [token, setToken] = useState<string | undefined>(undefined);
   const [bhogaSchedule, setBhogaSchedule] = useState<BhogaSchedule | null>(
     null
@@ -59,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Expose a fetchUsers handler
   const fetchUsers = async () => {
+    setusersloading(true);
     try {
       const res = await axios.get(`${BACKEND_URL}/auth/api/users`, {
         headers: token ? { Authorization: `Bearer ${token}` } : undefined,
@@ -69,6 +73,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.error("Failed to fetch users:", error.message);
       setUsers([]);
       Promise.reject(error);
+    } finally {
+      setusersloading(false);
     }
   };
 
@@ -203,6 +209,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         registerUser,
         users,
         fetchUsers,
+        usersloading,
         bhogaSchedule,
         fetchBhogaSchedule,
         updateBhogaSchedule,

@@ -37,6 +37,7 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
   const today = new Date().toISOString().split("T")[0];
   const [formData, setFormData] = useState({
     mangalaAarti: false,
+    mangalaAartiReason: "",
     japaRounds: 0,
     lectureDuration: "",
     wakeUpTime: "",
@@ -58,6 +59,7 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
           lectureDuration: activity.lectureDuration,
           lectureDesciption: activity.lectureDesciption,
           readingDuration: activity.readingDuration,
+          mangalaAartiReason: activity.mangalaAartiReason,
           readingDesciption: activity.readingDesciption,
           wakeUpTime: activity.wakeUpTime,
           sleepTime: activity.sleepTime,
@@ -164,6 +166,25 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
                   className="data-[state=checked]:bg-primary"
                 />
               </div>
+              {!formData.mangalaAarti && (
+                <div className="mt-4">
+                  <Label htmlFor="mangalaAartiReason">
+                    Reason for not attending Mangala Aarti
+                  </Label>
+                  <Textarea
+                    id="mangalaAartiReason"
+                    value={formData.mangalaAartiReason}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        mangalaAartiReason: e.target.value,
+                      }))
+                    }
+                    placeholder="Please enter your reason"
+                    className="mt-1"
+                  />
+                </div>
+              )}
             </div>
 
             {/* Japa Rounds */}
@@ -520,7 +541,7 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-4 pt-4">
+            <div className="flex gap-4 pt-4 flex-wrap">
               <Button
                 type="submit"
                 className="flex-1 gradient-divine hover-divine transition-sacred text-white font-semibold py-4 text-lg"
@@ -534,7 +555,7 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
                 type="button"
                 variant="outline"
                 onClick={onClose}
-                className="px-6 py-4 border-primary/20 hover:border-primary/50 transition-sacred"
+                className="px-6 py-4 border-primary/20 hover:border-primary/50 transition-sacred md:w-1/3 w-full"
               >
                 <X className="w-5 h-5 mr-2" />
                 Cancel
