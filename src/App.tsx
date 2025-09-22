@@ -74,7 +74,7 @@ const MainApp = () => {
               className="transition-sacred text-white hover-divine bg-red-500 hover:bg-red-300 py-4"
               loading={logoutLoading}
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <LogOut className="h-4" />
               {/* Exit */}
             </AntButton>
           </div>
