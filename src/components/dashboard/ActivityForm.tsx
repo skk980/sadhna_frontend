@@ -161,7 +161,11 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
                   id="mangalaAarti"
                   checked={formData.mangalaAarti}
                   onCheckedChange={(checked) =>
-                    setFormData((prev) => ({ ...prev, mangalaAarti: checked }))
+                    setFormData((prev) => ({
+                      ...prev,
+                      mangalaAarti: checked,
+                      mangalaAartiReason: "",
+                    }))
                   }
                   className="data-[state=checked]:bg-primary"
                 />
