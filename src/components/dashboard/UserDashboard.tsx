@@ -222,7 +222,9 @@ export const UserDashboard = () => {
                       Preaching Management
                     </DialogTitle>
                   </DialogHeader>
-                  <PreachingManagementTable />
+                  <PreachingManagementTable
+                    setShowPreachingManagement={setShowPreachingManagement}
+                  />
                 </DialogContent>
               </Dialog>
             </div>

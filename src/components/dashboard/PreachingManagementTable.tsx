@@ -18,7 +18,7 @@ import { X } from "lucide-react";
 
 const rangeDays = 14;
 
-export const PreachingManagementTable = () => {
+export const PreachingManagementTable = ({ setShowPreachingManagement }) => {
   const { activities, loadActivities, updatePreachingContacts } =
     useActivities();
   const [dates, setDates] = useState([]);
@@ -262,7 +262,7 @@ export const PreachingManagementTable = () => {
         <Button
           size="sm"
           disabled={currentPage === totalPages}
-          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          onClick={() => setShowPreachingManagement(false)}
           variant="destructive"
         >
           <X className="h-4" />
