@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Spin } from "antd";
+import { X } from "lucide-react";
 
 const rangeDays = 14;
 
@@ -257,6 +258,15 @@ export const PreachingManagementTable = () => {
           onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
         >
           Next
+        </Button>
+        <Button
+          size="sm"
+          disabled={currentPage === totalPages}
+          onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+          variant="destructive"
+        >
+          <X className="h-4" />
+          {/* Exit */}
         </Button>
       </div>
     </div>
