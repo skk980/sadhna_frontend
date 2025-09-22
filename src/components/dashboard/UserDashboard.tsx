@@ -199,7 +199,7 @@ export const UserDashboard = () => {
         {/* Preaching Activities Card */}
         <Card className="divine-glow transition-sacred hover-divine bg-card/90 backdrop-blur-sm">
           <CardHeader>
-            <div className="flex justify-between">
+            <div className="flex-wrap md:flex justify-between">
               <CardTitle className="flex items-center gap-2 text-primary">
                 <Award className="h-5 w-5 animate-sacred-pulse" />
                 Preaching Activities Summary
@@ -208,6 +208,7 @@ export const UserDashboard = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowPreachingManagement(true)}
+                className="mt-4 md:mt-0"
               >
                 Manage Preaching
               </Button>
