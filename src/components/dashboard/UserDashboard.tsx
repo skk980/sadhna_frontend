@@ -39,10 +39,12 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { PreachingManagementTable } from "./PreachingManagementTable";
 
 export const UserDashboard = () => {
   const { auth } = useAuth();
   const { activities, getActivityByDate } = useActivities(auth.user?._id);
+  const [showPreachingManagement, setShowPreachingManagement] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [showActivityForm, setShowActivityForm] = useState(false);
   const [reasonModalOpen, setReasonModalOpen] = useState(false);
@@ -197,10 +199,32 @@ export const UserDashboard = () => {
         {/* Preaching Activities Card */}
         <Card className="divine-glow transition-sacred hover-divine bg-card/90 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
-              <Award className="h-5 w-5 animate-sacred-pulse" />
-              Preaching Activities Summary
-            </CardTitle>
+            <div className="flex justify-between">
+              <CardTitle className="flex items-center gap-2 text-primary">
+                <Award className="h-5 w-5 animate-sacred-pulse" />
+                Preaching Activities Summary
+              </CardTitle>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowPreachingManagement(true)}
+              >
+                Manage Preaching
+              </Button>
+              <Dialog
+                open={showPreachingManagement}
+                onOpenChange={setShowPreachingManagement}
+              >
+                <DialogContent className="w-full max-w-full h-full max-h-full p-6 overflow-auto">
+                  <DialogHeader>
+                    <DialogTitle className="text-center">
+                      Preaching Management
+                    </DialogTitle>
+                  </DialogHeader>
+                  <PreachingManagementTable />
+                </DialogContent>
+              </Dialog>
+            </div>
             <CardDescription>
               Your efforts in spreading Krishna consciousness
             </CardDescription>

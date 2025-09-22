@@ -22,6 +22,7 @@ interface ActivitiesContextType {
   getActivityByDate: (date: string) => Activity | undefined;
   canEditActivity: (date: string) => boolean;
   loadActivities: () => Promise<void>;
+  updatePreachingContacts: () => void;
 }
 
 const ActivitiesContext = createContext<ActivitiesContextType | undefined>(
@@ -105,6 +106,33 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updatePreachingContacts = async (
+    activityId: string,
+    updatedContacts: []
+  ) => {
+    if (!token) {
+      console.error("Missing auth token for updating activity");
+      return Promise.reject();
+    }
+    try {
+      const updates = { preachingContacts: updatedContacts };
+      const res = await axios.put(
+        `${BACKEND_URL}/activities/${activityId}`,
+        updates,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+      setActivities((prev) =>
+        prev.map((a) => (a._id === activityId ? res.data.activity : a))
+      );
+      return Promise.resolve();
+    } catch (error) {
+      console.error("Failed to update preaching contacts:", error.message);
+      return Promise.reject();
+    }
+  };
+
   const getActivityByDate = (date: string) =>
     activities.find((a) => a.date === date);
 
@@ -123,6 +151,7 @@ export const ActivitiesProvider = ({ children }: { children: ReactNode }) => {
         getActivityByDate,
         canEditActivity,
         loadActivities,
+        updatePreachingContacts,
       }}
     >
       {children}
