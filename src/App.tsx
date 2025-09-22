@@ -68,7 +68,7 @@ const MainApp = () => {
               </p>
             </div>
             <AntButton
-              type="dashed"
+              type="default"
               size="small"
               onClick={logout}
               className="transition-sacred text-white hover-divine bg-red-500 hover:bg-red-300 py-4"
