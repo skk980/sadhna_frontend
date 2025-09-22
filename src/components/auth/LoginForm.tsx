@@ -13,6 +13,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Flower2, Sun, Star } from "lucide-react";
 
+import ISKCON_LOGO from "@/assets/iskcon_logo.png";
+
 interface LoginFormProps {
   onSwitchToRegister: () => void;
 }
@@ -63,7 +65,13 @@ export const LoginForm = ({ onSwitchToRegister }: LoginFormProps) => {
         <CardHeader className="text-center space-y-4">
           <div className="flex justify-center mb-4">
             <div className="relative">
-              <Flower2 className="w-16 h-16 text-primary" />
+              {/* <Flower2 className="w-16 h-16 text-primary" /> */}
+              <img
+                src={ISKCON_LOGO}
+                width={150}
+                height={150}
+                className="text-primary"
+              />
             </div>
           </div>
           <CardTitle className="text-3xl font-bold text-foreground">

@@ -14,6 +14,8 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ActivitiesProvider } from "@/context/ActivitiesContext";
 import { Button as AntButton, Spin } from "antd";
 
+import ISKCON_LOGO from "./assets/iskcon_logo.png";
+
 const queryClient = new QueryClient();
 
 const MainApp = () => {
@@ -44,7 +46,7 @@ const MainApp = () => {
         <div className="container mx-auto px-4 py-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="relative">
-              <Flower2 className="w-8 h-8 text-primary animate-divine-float" />
+              <img src={ISKCON_LOGO} width={45} height={45} />
               <div className="absolute inset-0 bg-primary/20 rounded-full blur-lg"></div>
             </div>
             <div>
