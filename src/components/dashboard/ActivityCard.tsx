@@ -37,6 +37,11 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
   const { canEditActivity } = useActivities();
   const [showEditForm, setShowEditForm] = useState(false);
   const [reasonModalOpen, setReasonModalOpen] = useState(false);
+  const [hearingReadingDescModal, setHearingReadingDescModal] = useState({
+    index: null,
+    status: false,
+    mode: null,
+  });
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -69,7 +74,7 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
                       <Button
                         variant="link"
                         size="icon"
-                        aria-label="View mangala aarti reason"
+                        aria-label="Mangala aarti reason"
                         onClick={() => setReasonModalOpen(true)}
                       >
                         <Eye className="w-4 h-4 text-secondary" />
@@ -147,20 +152,50 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
               Lecture Hearing Duration
             </p>
             {activity?.lectureDesciption && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Eye className="w-5 h-5 text-primary" />
+              <Dialog
+                open={
+                  hearingReadingDescModal.status &&
+                  hearingReadingDescModal.mode === "hearing"
+                }
+                onOpenChange={(val) => {
+                  setHearingReadingDescModal({
+                    index: null,
+                    status: val,
+                    mode: "hearing",
+                  });
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="link"
+                    size="icon"
+                    aria-label="Hearing description"
+                    onClick={() =>
+                      setHearingReadingDescModal({
+                        index: null,
+                        status: true,
+                        mode: "hearing",
+                      })
+                    }
+                  >
+                    <Eye className="w-4 h-4 text-primary" />
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="max-w-xs">
-                  <div className="text-sm">{activity.lectureDesciption}</div>
-                </PopoverContent>
-              </Popover>
+                </DialogTrigger>
+                <DialogContent className="max-w-sm">
+                  <DialogHeader>
+                    <DialogTitle className="italic">
+                      Lecture description
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4 text-base text-foreground">
+                    {activity.lectureDesciption}
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
           </div>
           <p className="text-2xl font-bold text-accent">
-            {activity?.lectureDuration}
+            {activity?.lectureDuration || 0}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             📚 Minutes of hearing
@@ -174,20 +209,50 @@ export const ActivityCard = ({ activity, selectedDate }: ActivityCardProps) => {
               Reading Duration
             </p>
             {activity.readingDesciption && (
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="ghost" size="icon">
-                    <Eye className="w-5 h-5 text-primary" />
+              <Dialog
+                open={
+                  hearingReadingDescModal.status &&
+                  hearingReadingDescModal.mode === "reading"
+                }
+                onOpenChange={(val) => {
+                  setHearingReadingDescModal({
+                    index: null,
+                    status: val,
+                    mode: "reading",
+                  });
+                }}
+              >
+                <DialogTrigger asChild>
+                  <Button
+                    variant="link"
+                    size="icon"
+                    aria-label="Reading description"
+                    onClick={() =>
+                      setHearingReadingDescModal({
+                        index: null,
+                        status: true,
+                        mode: "reading",
+                      })
+                    }
+                  >
+                    <Eye className="w-4 h-4 text-primary" />
                   </Button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="max-w-xs">
-                  <div className="text-sm">{activity.readingDesciption}</div>
-                </PopoverContent>
-              </Popover>
+                </DialogTrigger>
+                <DialogContent className="max-w-sm">
+                  <DialogHeader>
+                    <DialogTitle className="italic">
+                      Reading description
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="mt-4 text-base text-foreground">
+                    {activity.readingDesciption}
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
           </div>
           <p className="text-2xl font-bold text-accent">
-            {activity.readingDuration}
+            {activity.readingDuration || 0}
           </p>
           <p className="text-xs text-muted-foreground mt-1">
             📚 Minutes of learning

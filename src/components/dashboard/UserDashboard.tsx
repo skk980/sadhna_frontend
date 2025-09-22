@@ -450,7 +450,7 @@ export const UserDashboard = () => {
                                     minute: "2-digit",
                                     hour12: true,
                                   })
-                                : " Date not available"}
+                                : " Not set"}
                             </p>
 
                             <p className="flex items-center gap-2">
@@ -468,7 +468,7 @@ export const UserDashboard = () => {
                                     <Button
                                       variant="link"
                                       size="icon"
-                                      aria-label="View mangala aarti reason"
+                                      aria-label="Mangala aarti reason"
                                       onClick={() => setReasonModalOpen(true)}
                                       className="p-0 m-0"
                                     >
@@ -501,12 +501,12 @@ export const UserDashboard = () => {
                             </p>
                             <p className="flex items-center gap-2">
                               <Clock className="w-3 h-3" />
-                              Lecture Hearing: {activity.lectureDuration}
+                              Lecture Hearing: {activity.lectureDuration || 0}
                               minutes
                             </p>
                             <p className="flex items-center gap-2">
                               <Clock className="w-3 h-3" />
-                              Reading Hearing: {activity.readingDuration}
+                              Reading Hearing: {activity.readingDuration || 0}
                               minutes
                             </p>
                             <p className="flex items-center gap-2">

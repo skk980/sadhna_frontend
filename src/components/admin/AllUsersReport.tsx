@@ -46,7 +46,11 @@ export const AllUsersReport = ({
   );
   const [reasonModalOpen, setReasonModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [hearingReadingDescModal, setHearingReadingDescModal] = useState({
+    index: null,
+    status: false,
+    mode: null,
+  });
   const filteredData = useMemo(() => {
     let filteredActivities = activities;
     let filteredUsers = users;
@@ -152,8 +156,8 @@ export const AllUsersReport = ({
                       </Badge>
                     </TableCell>
                     <TableCell>{stats.totalJapaRounds}</TableCell>
-                    <TableCell>{stats.totalLectureDuration} min</TableCell>
-                    <TableCell>{stats.totalReadingDuration} min</TableCell>
+                    <TableCell>{stats.totalLectureDuration || 0} min</TableCell>
+                    <TableCell>{stats.totalReadingDuration || 0} min</TableCell>
                     <TableCell>
                       {stats.preachingContacts > 0 ? (
                         <Button
@@ -217,7 +221,7 @@ export const AllUsersReport = ({
                   (a, b) =>
                     new Date(b.date).getTime() - new Date(a.date).getTime()
                 )
-                .map((activity) => {
+                .map((activity, index) => {
                   const user = users.find(
                     (u) => u._id === activity?.userId?._id
                   );
@@ -259,7 +263,7 @@ export const AllUsersReport = ({
                               <Button
                                 variant="link"
                                 size="icon"
-                                aria-label="View mangala aarti reason"
+                                aria-label="Mangala aarti reason"
                                 onClick={() => setReasonModalOpen(true)}
                               >
                                 <Eye className="w-4 h-4 text-primary" />
@@ -280,39 +284,97 @@ export const AllUsersReport = ({
                       </TableCell>
                       <TableCell>{activity.japaRounds}</TableCell>
                       <TableCell>
-                        {activity.lectureDuration} min &nbsp;
-                        {activity.lectureDesciption && (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                        {activity.lectureDuration || 0} min &nbsp;
+                        {activity?.lectureDesciption && (
+                          <Dialog
+                            open={
+                              hearingReadingDescModal.status &&
+                              hearingReadingDescModal.index === index &&
+                              hearingReadingDescModal.mode === "hearing"
+                            }
+                            onOpenChange={(val) => {
+                              setHearingReadingDescModal({
+                                index,
+                                status: val,
+                                mode: "hearing",
+                              });
+                            }}
+                          >
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="link"
+                                size="icon"
+                                aria-label="Hearing description"
+                                onClick={() =>
+                                  setHearingReadingDescModal({
+                                    index,
+                                    status: true,
+                                    mode: "hearing",
+                                  })
+                                }
+                              >
                                 <Eye className="w-4 h-4 text-primary" />
                               </Button>
-                            </PopoverTrigger>
-                            <PopoverContent align="start" className="max-w-xs">
-                              <div className="text-sm py-4">
+                            </DialogTrigger>
+                            <DialogContent className="max-w-sm">
+                              <DialogHeader>
+                                <DialogTitle className="italic">
+                                  Lecture description
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="mt-4 text-base text-foreground">
                                 {activity.lectureDesciption}
                               </div>
-                            </PopoverContent>
-                          </Popover>
+                            </DialogContent>
+                          </Dialog>
                         )}
                       </TableCell>
 
                       {/* Reading Duration Cell */}
                       <TableCell>
-                        {activity.readingDuration} min &nbsp;
-                        {activity.readingDesciption && (
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button variant="ghost" size="icon">
+                        {activity.readingDuration || 0} min &nbsp;
+                        {activity?.readingDesciption && (
+                          <Dialog
+                            open={
+                              hearingReadingDescModal.status &&
+                              hearingReadingDescModal.index === index &&
+                              hearingReadingDescModal.mode === "reading"
+                            }
+                            onOpenChange={(val) => {
+                              setHearingReadingDescModal({
+                                index,
+                                status: val,
+                                mode: "reading",
+                              });
+                            }}
+                          >
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="link"
+                                size="icon"
+                                aria-label="Reading description"
+                                onClick={() =>
+                                  setHearingReadingDescModal({
+                                    index,
+                                    status: true,
+                                    mode: "reading",
+                                  })
+                                }
+                              >
                                 <Eye className="w-4 h-4 text-primary" />
                               </Button>
-                            </PopoverTrigger>
-                            <PopoverContent align="start" className="max-w-xs">
-                              <div className="text-sm py-4">
-                                {activity.readingDesciption}
+                            </DialogTrigger>
+                            <DialogContent className="max-w-sm">
+                              <DialogHeader>
+                                <DialogTitle className="italic">
+                                  Reading description
+                                </DialogTitle>
+                              </DialogHeader>
+                              <div className="mt-4 text-base text-foreground">
+                                {activity.lectureDesciption}
                               </div>
-                            </PopoverContent>
-                          </Popover>
+                            </DialogContent>
+                          </Dialog>
                         )}
                       </TableCell>
                       <TableCell>
