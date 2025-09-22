@@ -75,7 +75,7 @@ const MainApp = () => {
               loading={logoutLoading}
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Exit
+              {/* Exit */}
             </AntButton>
           </div>
         </div>
