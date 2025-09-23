@@ -70,13 +70,13 @@ export const PreachingReport = () => {
           <h3 className="font-semibold text-foreground">
             Recent Preaching Activity
           </h3>
-          <div className="h-full overflow-y-auto space-y-3">
+          <div style={{ height: 600 }} className="overflow-y-auto space-y-3">
             {preachingData.slice(0, 10).map((activity) => (
               <div
                 key={activity._id}
                 className="border border-primary/20 rounded-lg p-4"
               >
-                <div className="flex justify-between items-start mb-3">
+                <div className="block md:flex justify-between items-start mb-3">
                   <div className="flex items-center gap-2">
                     <User className="w-4 h-4 text-primary" />
                     <span className="font-medium">
