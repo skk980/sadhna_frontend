@@ -12,6 +12,13 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Flower2, Sun, Star, UserPlus } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../ui/select";
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -21,6 +28,7 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isBaseMember, setIsBaseMember] = useState(false);
   const { registerUser } = useAuth();
   const { toast } = useToast();
 
@@ -28,7 +36,7 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
     e.preventDefault();
     setLoading(true);
 
-    const success = await registerUser(name, email);
+    const success = await registerUser(name, email, isBaseMember);
 
     if (success) {
       toast({
@@ -133,6 +141,29 @@ export const RegisterForm = ({ onSwitchToLogin }: RegisterFormProps) => {
                 />
                 <Sun className="absolute right-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-accent/50" />
               </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label
+                htmlFor="isBaseMember"
+                className="text-sm font-medium text-foreground"
+              >
+                Are you a Base Member?
+              </Label>
+              <Select
+                value={isBaseMember ? "yes" : "No"}
+                onValueChange={(val) => setIsBaseMember(val === "yes")}
+                disabled={loading}
+                aria-label="Is Base Member"
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select membership status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="bg-gradient-lotus p-4 rounded-lg border border-primary/10">

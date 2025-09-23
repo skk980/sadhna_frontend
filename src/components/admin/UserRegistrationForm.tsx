@@ -3,6 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -22,31 +29,29 @@ export const UserRegistrationForm = ({
 }: UserRegistrationFormProps) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [isBaseMember, setIsBaseMember] = useState(false);
   const { registerUser } = useAuth();
   const { toast } = useToast();
-  const { auth, fetchUsers } = useAuth();
-  const [registerloading, setregisterloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setregisterloading(true);
+    setLoading(true);
     try {
-      await registerUser(name, email);
+      await registerUser(name, email, isBaseMember);
       toast({
         title: "User Registered",
         description: `${name} has been successfully registered`,
       });
-      await fetchUsers();
-      setregisterloading(false);
+      setLoading(false);
       onClose();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Registration Failed",
-        description: error.message,
+        description: error.message || "Unknown error",
         variant: "destructive",
       });
-    } finally {
-      setregisterloading(false);
+      setLoading(false);
     }
   };
 
@@ -60,7 +65,7 @@ export const UserRegistrationForm = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Spin spinning={registerloading}>
+        <Spin spinning={loading}>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
@@ -83,6 +88,24 @@ export const UserRegistrationForm = ({
                 placeholder="Enter email address"
                 required
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Is Base Member?</Label>
+              <Select
+                value={isBaseMember ? "yes" : "no"}
+                onValueChange={(val) => setIsBaseMember(val === "yes")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select membership status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="yes" className="border-b border-gray-300">
+                    Yes
+                  </SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="bg-muted/50 p-3 rounded-md">

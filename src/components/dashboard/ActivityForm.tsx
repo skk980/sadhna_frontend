@@ -543,7 +543,7 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
                       />
                       <div className="flex gap-2">
                         <Input
-                          placeholder="Phone (optional)"
+                          placeholder="Phone (required)"
                           value={contact.phone || ""}
                           onChange={(e) => {
                             const updatedContacts = [

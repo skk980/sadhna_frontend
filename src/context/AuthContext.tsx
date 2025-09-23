@@ -147,6 +147,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const registerUser = async (
     name: string,
     email: string,
+    isBaseMember: boolean,
     password = "password"
   ): Promise<boolean> => {
     try {
@@ -158,6 +159,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           password,
           role: "user",
           adminId: auth.user?._id,
+          isBaseMember,
         },
         {
           headers: { Authorization: `Bearer ${token}` },

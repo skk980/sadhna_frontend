@@ -96,7 +96,9 @@ export const BhogaReport = () => {
   };
 
   const handleUserChange = (day: string, userId: string) => {
-    const filteruser = users.find((u) => u._id === userId);
+    const filteruser = users
+      ?.filter((e) => e.isBaseMember)
+      ?.find((u) => u._id === userId);
     console.log(filteruser, userId);
     setLocalScheduleTemp((prev) => ({ ...prev, [day]: filteruser }));
   };
@@ -165,8 +167,11 @@ export const BhogaReport = () => {
                             </SelectTrigger>
                             <SelectContent position="popper">
                               {users
-                                ?.filter((u) => u.role === "user")
-                                .map((user) => {
+                                ?.filter(
+                                  (u) =>
+                                    u.role === "user" && u.isBaseMember == true
+                                )
+                                ?.map((user) => {
                                   return (
                                     <SelectItem key={user._id} value={user._id}>
                                       {user.name}
@@ -209,22 +214,27 @@ export const BhogaReport = () => {
         </CardHeader>
         <CardContent className="space-y-4">
           {upcomingDays.map((date) => {
-            const offerings = getBhogaOfferingsForDate(date);
+            const offerings = getBhogaOfferingsForDate(date)?.filter(
+              (e) => e?.userId?.isBaseMember === true
+            );
             const dayName = format(date, "eeee").toLowerCase(); // e.g. 'monday'
             const dateLabel = isToday(date)
               ? "Today"
               : isTomorrow(date)
               ? "Tomorrow"
               : format(date, "MMM dd, yyyy");
-
+            console.log(users);
             // Assigned user id and name for this day
             const assignedUserId =
               dayName !== "sunday" ? localSchedule?.[dayName]?._id : null;
             const assignedUserName = assignedUserId
-              ? users.find((u) => u._id === assignedUserId)?.name || "Unknown"
+              ? users
+                  ?.filter((e) => e.isBaseMember)
+                  .find((u) => u._id === assignedUserId)?.name || null
               : null;
 
             // User IDs who actually offered bhoga on this day
+
             const offeringUserIds = offerings.map((a) => a?.userId?._id);
 
             // Determine if assigned user did not offer but others did
