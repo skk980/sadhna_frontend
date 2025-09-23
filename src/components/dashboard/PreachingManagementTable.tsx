@@ -15,26 +15,47 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Spin } from "antd";
 import { X } from "lucide-react";
+import { usePreachingStatus } from "@/context/PreachingStatusContext";
+import { useAuth } from "@/context/AuthContext";
 
 const rangeDays = 14;
 
 export const PreachingManagementTable = ({ setShowPreachingManagement }) => {
-  const { activities, loadActivities, updatePreachingContacts } =
-    useActivities();
+  const { activities, loadActivities } = useActivities();
+  const { auth } = useAuth();
+  const {
+    preachingStatuses,
+    loadPreachingStatuses,
+    updatePreachingStatusesBulk,
+    updatePreachingStatus,
+    loading,
+  } = usePreachingStatus();
   const [dates, setDates] = useState([]);
-  const [localActivities, setLocalActivities] = useState([]);
-  const [editedContactsMap, setEditedContactsMap] = useState({});
-  const [saveStatusLoading, setsaveStatusLoading] = useState(false);
-
+  const [allContacts, setAllContacts] = useState([]);
+  const [editedStatusMap, setEditedStatusMap] = useState({});
+  const [savingDates, setSavingDates] = useState({});
   const { toast } = useToast();
+
+  useEffect(() => {
+    const allContacts = [];
+
+    activities.forEach((activity) => {
+      if (activity.preachingContacts) {
+        allContacts.push(...activity.preachingContacts);
+      }
+    });
+
+    setAllContacts(allContacts);
+  }, [activities]);
 
   useEffect(() => {
     const baseDate = new Date();
     const range = [];
-    for (let i = -7; i <= 7; i++) {
+    // Generate dates from today (i=0) going backwards to past 7 days (i=-7)
+    for (let i = 0; i >= -7; i--) {
       range.push(addDays(baseDate, i));
     }
-    // Sort descending (latest date first)
+    // Sort descending to have latest (today) on top
     range.sort((a, b) => b.getTime() - a.getTime());
     setDates(range);
   }, []);
@@ -44,86 +65,76 @@ export const PreachingManagementTable = ({ setShowPreachingManagement }) => {
   }, []);
 
   useEffect(() => {
-    setLocalActivities(activities);
-  }, [activities]);
+    if (dates.length) {
+      loadPreachingStatuses(dates.map((d) => format(d, "yyyy-MM-dd")));
+    }
+  }, [dates, loadPreachingStatuses]);
 
-  const handleEditChange = (activityId, contactId, field, value) => {
-    setEditedContactsMap((prev) => {
-      const prevActivityChanges = prev[activityId] || {};
-      const prevContact = prevActivityChanges[contactId] || {};
+  const handleStatusChange = (date, contactNumber, field, value) => {
+    setEditedStatusMap((prev) => {
+      const prevContact = prev?.[date]?.[auth.user._id]?.[contactNumber] || {};
+
+      const updatedContact = {
+        ...prevContact,
+        [field]: value,
+      };
+
       return {
         ...prev,
-        [activityId]: {
-          ...prevActivityChanges,
-          [contactId]: {
-            ...prevContact,
-            [field]: value,
+        [date]: {
+          ...prev[date],
+          [auth.user._id]: {
+            ...prev[date]?.[auth.user._id],
+            [contactNumber]: updatedContact,
           },
         },
       };
     });
   };
 
-  const handleSave = async (activityId) => {
-    const activity = localActivities.find((a) => a._id === activityId);
-    if (!activity) return;
+  const hasChanges = (date) =>
+    !!editedStatusMap?.[date] &&
+    Object.keys(editedStatusMap?.[date] || {}).length > 0;
 
-    const updates = { preachingContacts: [...activity.preachingContacts] };
+  const handleSave = async (date) => {
+    if (!editedStatusMap[date] || !editedStatusMap[date][auth.user._id]) return;
 
-    if (editedContactsMap[activityId]) {
-      Object.entries(editedContactsMap[activityId]).forEach(
-        ([contactId, fields]) => {
-          const contactIndex = updates.preachingContacts.findIndex(
-            (c) => c.id === contactId
-          );
-          if (contactIndex !== -1) {
-            updates.preachingContacts[contactIndex] = {
-              ...updates.preachingContacts[contactIndex],
-              ...fields,
-            };
-          }
-        }
-      );
-    }
-    setsaveStatusLoading(true);
+    // setSavingDates((prev) => ({ ...prev, [date]: true }));
+
+    const contactStatuses = Object.entries(
+      editedStatusMap[date][auth.user._id]
+    ).map(([contactNumber, changes]) => ({
+      userId: auth.user._id,
+      status: changes.status ?? "",
+      attended: changes.attended ?? false,
+      contactNumber,
+      contactName: changes.contactName ?? "",
+    }));
+
+    if (contactStatuses.length === 0) return;
+
     try {
-      await updatePreachingContacts(activityId, updates.preachingContacts);
-      setEditedContactsMap((prev) => {
-        const copy = { ...prev };
-        delete copy[activityId];
-        return copy;
-      });
+      await updatePreachingStatusesBulk(date, contactStatuses);
+      loadPreachingStatuses(dates.map((d) => format(d, "yyyy-MM-dd")));
+
       toast({
-        title: "✨ Status Updated",
-        description: "Your sacred status has been updated successfully",
+        title: "✨ Status updated",
+        description: `Preaching statuses updated for ${date}`,
       });
     } catch (error) {
-      console.error("Save failed", error.message);
       toast({
-        title: "🚫 Cannot Update",
+        title: "🚫 Failed to save preaching statuses.",
         description: error.message,
         variant: "destructive",
       });
     } finally {
-      setsaveStatusLoading(false);
+      setSavingDates((prev) => ({ ...prev, [date]: false }));
     }
-  };
-
-  const handleCancel = (activityId) => {
-    setEditedContactsMap((prev) => {
-      const copy = { ...prev };
-      delete copy[activityId];
-      return copy;
-    });
   };
 
   const itemsPerPage = 8;
   const [currentPage, setCurrentPage] = useState(1);
-
-  // Calculate total pages
   const totalPages = Math.ceil(dates.length / itemsPerPage);
-
-  // Get dates for current page
   const paginatedDates = dates.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -131,8 +142,8 @@ export const PreachingManagementTable = ({ setShowPreachingManagement }) => {
 
   return (
     <div className="overflow-auto">
-      <Spin spinning={saveStatusLoading}>
-        <Table>
+      <Spin spinning={loading}>
+        <Table style={{ height: "80vh", overflowY: "auto" }}>
           <TableHeader>
             <TableRow>
               <TableHead className="border-r border-gray-300">Date</TableHead>
@@ -144,103 +155,125 @@ export const PreachingManagementTable = ({ setShowPreachingManagement }) => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {paginatedDates?.flatMap((date) => {
-              const dateStr = format(date, "yyyy-MM-dd");
-              const activity = localActivities.find((a) => a.date === dateStr);
-              if (!activity || !activity.preachingContacts.length) {
-                return (
-                  <TableRow key={dateStr + "-empty"}>
-                    <TableCell>{format(date, "eeee, MMM dd")}</TableCell>
-                    <TableCell
-                      colSpan={3}
-                      className="text-center text-muted-foreground"
-                    >
-                      No preaching contacts for this day
-                    </TableCell>
-                  </TableRow>
-                );
-              }
+            {paginatedDates?.length == 0 || allContacts?.length === 0 ? (
+              <TableRow>
+                <TableCell
+                  colSpan={4}
+                  className="text-center py-8 text-muted-foreground"
+                >
+                  No preaching contacts found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              paginatedDates?.flatMap((date) => {
+                const dateStr = format(date, "yyyy-MM-dd");
+                return allContacts?.map((contact, idx) => {
+                  // console.log(preachingStatuses[dateStr], auth.user._id, contact);
 
-              return (
-                <>
-                  {activity.preachingContacts.map((contact, idx) => {
-                    const editedContact =
-                      editedContactsMap[activity._id]?.[contact.id] || {};
-                    const statusVal =
-                      editedContact.status ?? contact.status ?? "";
-                    const attendedVal =
-                      editedContact.attended ?? contact.attended ?? false;
-                    return (
-                      <TableRow
-                        key={`${dateStr}-${contact.id}`}
-                        className="!align-top"
-                      >
-                        {idx === 0 && (
-                          <TableCell
-                            rowSpan={activity.preachingContacts.length}
-                            className="align-top border-r border-gray-300"
-                          >
-                            {format(date, "eeee, MMM dd")}
-                            {/* Save-cancel buttons under date */}
-                            <div className="flex gap-2 mt-4">
-                              <Button
-                                size="sm"
-                                onClick={() => handleSave(activity._id)}
-                              >
-                                Save
-                              </Button>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleCancel(activity._id)}
-                              >
-                                Cancel
-                              </Button>
-                            </div>
-                          </TableCell>
-                        )}
-                        <TableCell className="border-r border-gray-300">
-                          {contact.name} - {contact.phone}
+                  const editedEntry =
+                    editedStatusMap?.[dateStr]?.[auth.user._id]?.[
+                      contact.phone
+                    ];
+
+                  const storedContactsStatus =
+                    preachingStatuses?.[dateStr]?.[auth.user._id] ?? {};
+                  const storedStatus =
+                    storedContactsStatus?.[contact.phone] ?? {};
+
+                  const statusVal =
+                    editedEntry?.status ?? storedStatus?.status ?? "";
+                  const attendedVal =
+                    editedEntry?.attended ?? storedStatus?.attended ?? false;
+
+                  return (
+                    <TableRow
+                      key={`${dateStr}-${auth.user._id}-${contact.phone}`}
+                      className="!align-top"
+                    >
+                      {idx === 0 && (
+                        <TableCell
+                          rowSpan={allContacts.length}
+                          className="align-top border-r border-gray-300"
+                        >
+                          {format(date, "eeee, MMM dd")}
+                          <div className="flex gap-2 mt-4">
+                            <Button
+                              size="sm"
+                              disabled={
+                                !hasChanges(dateStr) || savingDates[dateStr]
+                              }
+                              loading={savingDates[dateStr]}
+                              onClick={() =>
+                                handleSave(
+                                  dateStr,
+                                  statusVal,
+                                  attendedVal,
+                                  contact?.phone,
+                                  contact?.name
+                                )
+                              }
+                            >
+                              Save
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              disabled={
+                                !hasChanges(dateStr) || savingDates[dateStr]
+                              }
+                              onClick={() => {
+                                setEditedStatusMap((prev) => {
+                                  const copy = { ...prev };
+                                  delete copy[dateStr];
+                                  return copy;
+                                });
+                              }}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
                         </TableCell>
-                        <TableCell className="border-r border-gray-300 ">
-                          <Input
-                            value={statusVal}
-                            onChange={(e) =>
-                              handleEditChange(
-                                activity._id,
-                                contact.id,
-                                "status",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter status"
-                            className="md:w-full w-[300px]"
-                          />
-                        </TableCell>
-                        <TableCell>
-                          <Switch
-                            id={`attended-${activity._id}-${contact.id}`}
-                            checked={attendedVal}
-                            onCheckedChange={(checked) =>
-                              handleEditChange(
-                                activity._id,
-                                contact.id,
-                                "attended",
-                                checked
-                              )
-                            }
-                          />
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </>
-              );
-            })}
+                      )}
+                      <TableCell className="border-r border-gray-300">
+                        {contact.name} - {contact.phone}
+                      </TableCell>
+                      <TableCell className="border-r border-gray-300">
+                        <Input
+                          value={statusVal}
+                          onChange={(e) =>
+                            handleStatusChange(
+                              dateStr,
+                              contact.phone,
+                              "status",
+                              e.target.value
+                            )
+                          }
+                          placeholder="Enter status"
+                          className="md:w-full w-[300px]"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <Switch
+                          id={`attended-${dateStr}-${contact.id}`}
+                          checked={attendedVal}
+                          onCheckedChange={(checked) =>
+                            handleStatusChange(
+                              dateStr,
+                              contact.phone,
+                              "attended",
+                              checked
+                            )
+                          }
+                        />
+                      </TableCell>
+                    </TableRow>
+                  );
+                });
+              })
+            )}
           </TableBody>
         </Table>
       </Spin>
-
       <div className="mt-4 flex justify-center items-center gap-4">
         <Button
           size="sm"
@@ -261,12 +294,10 @@ export const PreachingManagementTable = ({ setShowPreachingManagement }) => {
         </Button>
         <Button
           size="sm"
-          disabled={currentPage === totalPages}
           onClick={() => setShowPreachingManagement(false)}
           variant="destructive"
         >
           <X className="h-4" />
-          {/* Exit */}
         </Button>
       </div>
     </div>

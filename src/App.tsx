@@ -15,6 +15,7 @@ import { ActivitiesProvider } from "@/context/ActivitiesContext";
 import { Button as AntButton, Spin } from "antd";
 
 import ISKCON_LOGO from "./assets/iskcon_logo.png";
+import { PreachingStatusProvider } from "./context/PreachingStatusContext";
 
 const queryClient = new QueryClient();
 
@@ -101,18 +102,20 @@ const MainApp = () => {
 const App = () => (
   <AuthProvider>
     <ActivitiesProvider>
-      <QueryClientProvider client={queryClient}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<MainApp />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
+      <PreachingStatusProvider>
+        <QueryClientProvider client={queryClient}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<MainApp />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </QueryClientProvider>
+      </PreachingStatusProvider>
     </ActivitiesProvider>
   </AuthProvider>
 );
