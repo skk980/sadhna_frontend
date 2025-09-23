@@ -80,6 +80,7 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
   }, [activities, activityId]);
 
   const fetchBhoga = async () => {
+    setactivityFormLoading(true);
     try {
       const tommrowday = format(addDays(new Date(), 1), "EEEE").toLowerCase();
       const todayday = format(addDays(new Date(), 0), "EEEE").toLowerCase();
@@ -102,6 +103,8 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
         description: err,
         variant: "destructive",
       });
+    } finally {
+      setactivityFormLoading(false);
     }
   };
 
