@@ -177,9 +177,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setBhogaSchedule(res.data.schedule || null);
-      return res;
+      return Promise.resolve(res.data.schedule);
     } catch (error) {
       setBhogaSchedule(null);
+      Promise.reject(error);
       console.log(error.message);
     }
   };

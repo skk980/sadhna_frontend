@@ -16,6 +16,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Flower2, Sun, Target, Clock, Moon, Save, X } from "lucide-react";
 import { Spin } from "antd";
 import { Textarea } from "../ui/textarea";
+import { addDays, format } from "date-fns";
 
 interface ActivityFormProps {
   onClose: () => void;
@@ -23,13 +24,14 @@ interface ActivityFormProps {
 }
 
 export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
-  const { auth } = useAuth();
+  const { auth, fetchBhogaSchedule } = useAuth();
   const {
     addActivity,
     updateActivity,
     getActivityByDate,
     canEditActivity,
     loadActivities,
+    activities,
   } = useActivities(auth.user?.id);
   const { toast } = useToast();
   const [activityFormLoading, setactivityFormLoading] = useState(false);
@@ -48,10 +50,17 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
     readingDuration: "",
     readingDesciption: "",
   });
+  const [istodayyourturnforbhoga, setistodayyourturnforbhoga] = useState({
+    day: 0,
+    status: false,
+  });
 
   useEffect(() => {
+    fetchBhoga();
+
     if (activityId) {
       const activity = getActivityByDate(today);
+
       if (activity) {
         setFormData({
           mangalaAarti: activity.mangalaAarti,
@@ -68,7 +77,33 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
         });
       }
     }
-  }, [activityId, getActivityByDate, today]);
+  }, [activities, activityId]);
+
+  const fetchBhoga = async () => {
+    try {
+      const tommrowday = format(addDays(new Date(), 1), "EEEE").toLowerCase();
+      const todayday = format(addDays(new Date(), 0), "EEEE").toLowerCase();
+
+      const fetchBhogaData = await fetchBhogaSchedule();
+
+      if (fetchBhogaData[tommrowday]?._id === auth.user._id) {
+        setistodayyourturnforbhoga({ day: 1, status: true });
+      } else if (
+        fetchBhogaData[todayday]?._id === auth.user._id &&
+        !formData?.bhogaOffering
+      ) {
+        setistodayyourturnforbhoga({ day: 0, status: true });
+      } else {
+        setistodayyourturnforbhoga({ day: 0, status: false });
+      }
+    } catch (err) {
+      toast({
+        title: err,
+        description: err,
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -403,6 +438,19 @@ export const ActivityForm = ({ onClose, activityId }: ActivityFormProps) => {
             </div>
 
             {/* Bhoga Offering */}
+
+            {istodayyourturnforbhoga?.status ? (
+              <div className="mb-4 p-4 rounded-lg bg-yellow-100 text-yellow-800 font-semibold text-center shadow-lg ring-2 ring-yellow-400">
+                {istodayyourturnforbhoga.day === 1 &&
+                istodayyourturnforbhoga.status === true
+                  ? "🌟 Tomorrow is your turn to offer Bhoga!"
+                  : istodayyourturnforbhoga.day === 0 &&
+                    istodayyourturnforbhoga?.status
+                  ? "🚩 Today is your turn to offer Bhoga!"
+                  : null}
+              </div>
+            ) : null}
+
             <div className="bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950/20 dark:to-red-950/20 p-4 rounded-lg border border-orange-200 dark:border-orange-800">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
